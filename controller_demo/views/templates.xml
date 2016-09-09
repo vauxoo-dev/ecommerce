@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="demo_hr_template" name="Demo Hr Template">
+            <t t-call="website.layout">
+                <h1>Empleados</h1>
+                <t t-as="employee" t-foreach="employees">
+                    <h2 t-field="employee.name"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</openerp>
