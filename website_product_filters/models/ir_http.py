@@ -22,25 +22,25 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import models
-from openerp.http import request
+from odoo import models
+from odoo.http import request
 
 
 class IrHttp(models.AbstractModel):
     _inherit = 'ir.http'
 
-    def _dispatch(self):
+    @classmethod
+    def _dispatch(cls):
         """Inherited in order to set a cookie in order to be able to go out
         of the page and keep the product sort while the session is active.
         """
-        resp = super(IrHttp, self)._dispatch()
+        resp = super(IrHttp, cls)._dispatch()
         if not request.registry:
             return resp
         # get the cookie from the website
         cookie_sort = request.httprequest.cookies.get('default_sort', '')
         # retrieve the website object
-        current_website = request.registry['website'].get_current_website(
-            request.cr, request.uid, context=request.context)
+        current_website = request.env['website'].get_current_website()
         # get the sort from the request made by te user or the cookie if
         # not found
         website_sort = request.params.get('product_sorter', cookie_sort)

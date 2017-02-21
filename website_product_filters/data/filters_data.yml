@@ -1,10 +1,10 @@
 -
     website_product_filters enable products_categories
 -
-  !python {model: ir.ui.view}: |
-    self.write(cr, uid, [ref('website_sale.products_categories')], {'active': True}, context={'active_test': True})
+  !python {model: ir.ui.view, id: website_sale.products_categories}: |
+    self.write({'active': True})
 -
     website_product_filters enable Products List View
 -
-  !python {model: ir.ui.view}: |
-    self.write(cr, uid, [ref('website_sale.products_list_view')], {'active': True}, context={'active_test': True})
+  !python {model: ir.ui.view, id: website_sale.products_list_view}: |
+    self.write({'active': True})

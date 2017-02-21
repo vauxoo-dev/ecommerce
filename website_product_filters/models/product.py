@@ -24,11 +24,10 @@
 ##############################################################################
 from datetime import datetime
 import time
-from openerp import models, fields, api
-from openerp import SUPERUSER_ID
+from odoo import models, fields, api
 
 
-class WebsiteSeoMetadata(models.Model):
+class WebsiteSeoMetadata(models.AbstractModel):
     _inherit = ["website.seo.metadata"]
     views = fields.Integer(
         'Views',
@@ -39,18 +38,17 @@ class WebsiteSeoMetadata(models.Model):
         help='This field shows the decimal time when a product is published'
         'on the website.')
 
-    @api.cr_uid_ids_context
-    def write(self, cr, uid, ids, values, context=None):
-        for record in ids:
+    @api.multi
+    def write(self, values):
+        for record in self:
             if values.get('views', False):
-                return super(WebsiteSeoMetadata, self).write(
-                    cr, SUPERUSER_ID, [record], values)
+                return super(WebsiteSeoMetadata, record).sudo().write(
+                    values)
             if values.get('website_published', False):
                 now = datetime.now()
                 decimal_time = time.mktime(now.timetuple())
                 values['decimal_time'] = decimal_time
-        return super(WebsiteSeoMetadata, self).write(
-            cr, uid, ids, values)
+        return super(WebsiteSeoMetadata, self).write(values)
 
 
 class WebsiteProductMetadata(models.Model):

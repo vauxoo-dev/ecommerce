@@ -74,8 +74,8 @@ class ProductCategory(models.Model):
     _parent_store = True
     _order = 'parent_left'
 
-    parent_left = fields.Integer('Left Parent', select=1)
-    parent_right = fields.Integer('Right Parent', select=1)
+    parent_left = fields.Integer('Left Parent', index=True)
+    parent_right = fields.Integer('Right Parent', index=True)
     parent_id = fields.Many2one(ondelete='restrict')
 
     product_ids = fields.Many2many(
@@ -168,12 +168,12 @@ class ProductCategory(models.Model):
         self._cr.execute('''
                 SELECT
                     l.attribute_id,
-                    array_agg(v.val_id)
+                    array_agg(v.product_attribute_value_id)
                 FROM
                     product_attribute_line AS l
                 LEFT OUTER JOIN
                     product_attribute_line_product_attribute_value_rel AS v ON
-                    v.line_id=l.id
+                    v.product_attribute_line_id=l.id
                 WHERE
                     product_tmpl_id IN %s
                 GROUP BY
@@ -271,11 +271,11 @@ class ProductTemplate(models.Model):
             context = {}
         vpartner = self.env['res.users'].browse(self.env.uid).partner_id
         vpricelist = vpartner.property_product_pricelist
+        # TODO: oscar@vauxoo.com the model price.type was remove from
         from_currency = self.env[
-            'product.price.type'].with_context(
-                pricelist=int(vpricelist),
-                partner=int(vpartner))._get_field_currency(
-                'list_price', ctx=context)
+            'product.pricelist'].with_context(
+                partner=int(vpartner)).browse(
+                    int(vpricelist)).currency_id
         to_currency = vpricelist.currency_id
 
         def compute_currency(price):

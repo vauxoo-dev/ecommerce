@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
-        <record id="product.Speakers" model="product.public.category">
+        <record id="website_sale.Speakers" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/speakers.jpg"/>
         </record>
-        <record id="product.Screen" model="product.public.category">
+        <record id="website_sale.Screen" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/screen.png"/>
         </record>
-        <record id="product.Keyboard_Mouse" model="product.public.category">
+        <record id="website_sale.Keyboard_Mouse" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/Keyboard_Mouse.jpeg"/>
         </record>
-        <record id="product.devices" model="product.public.category">
+        <record id="website_sale.devices" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/devices.jpg"/>
         </record>
-        <record id="product.sub_computers" model="product.public.category">
+        <record id="website_sale.sub_computers" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/computers.jpg"/>
         </record>
-        <record id="product.computers" model="product.public.category">
+        <record id="website_sale.sub_computers" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/computers.jpg"/>
         </record>
-        <record id="product.Computer_all_in_one" model="product.public.category">
+        <record id="website_sale.Computer_all_in_one" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/aio.png"/>
         </record>
-        <record id="product.laptops" model="product.public.category">
+        <record id="website_sale.laptops" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/laptop.png"/>
         </record>
-        <record id="product.Headset" model="product.public.category">
+        <record id="website_sale.Headset" model="product.public.category">
           <field name="image_medium" type="base64" file="product_filters/static/img/headset.png"/>
         </record>
 
@@ -58,7 +58,7 @@
         <record id="message_product_4" model="mail.message">
             <field name="model">product.template</field>
             <field name="rating">3</field>
-            <field name="res_id" ref="product.product_product_32_product_template"/>
+            <field name="res_id" ref="product.product_product_4_product_template"/>
         </record>
 
         <!-- Demo data to create attributes on products without values -->
@@ -71,14 +71,14 @@
             <field name="attribute_id" ref="product.product_attribute_1"/>
         </record>
         <record id="product_attribute_memory_line_3" model="product.attribute.line">
-            <field name="product_tmpl_id" ref="product.product_product_29_product_template"/>
+            <field name="product_tmpl_id" ref="product.product_product_7_product_template"/>
             <field name="attribute_id" ref="product.product_attribute_1"/>
             <field name="value_ids" eval="[(6,0,[ref('product.product_attribute_value_2')])]"/>
         </record>
         <record id="product.product_product_3_product_template" model="product.template">
             <field name="name">Samsung Galaxy Tab</field>
             <field name="website_published">1</field>
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.Computer_all_in_one')])]"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('website_sale.Computer_all_in_one')])]"/>
             <field name="image_medium" type="base64" file="product_filters/static/img/galaxy.png"/>
             <field name="attribute_line_ids" eval="[(6,0,[ref('product_attribute_memory_line_1')])]"/>
             <field name="product_brand_id" ref="brand_google"/>
@@ -86,7 +86,7 @@
         <record id="product.product_product_25_product_template" model="product.template">
             <field name="name">Google Nexus Tab</field>
             <field name="website_published">1</field>
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.Computer_all_in_one')])]"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('website_sale.Computer_all_in_one')])]"/>
             <field name="image_medium" type="base64" file="product_filters/static/img/nexus.png"/>
             <field name="attribute_line_ids" eval="[(6,0,[ref('product_attribute_memory_line_2')])]"/>
             <field name="product_brand_id" ref="brand_google"/>
@@ -95,15 +95,15 @@
             <field name="name">iPhone 6s Plus</field>
             <field name="website_published">1</field>
             <field name="list_price">260</field>
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.Computer_all_in_one')])]"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('website_sale.Computer_all_in_one')])]"/>
             <field name="image_medium" type="base64" file="product_filters/static/img/iphone.png"/>
             <field name="attribute_line_ids" eval="[(6,0,[ref('product_attribute_memory_line_3')])]"/>
             <field name="product_brand_id" ref="brand_apple"/>
         </record>
-        <record id="product.product_product_31_product_template" model="product.template">
+        <record id="product.product_product_5b_product_template" model="product.template">
             <field name="website_published">1</field>
             <field name="list_price">260</field>
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.Speakers')])]"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('website_sale.Speakers')])]"/>
             <field name="product_brand_id" ref="brand_bose"/>
         </record>
         <record id="product.product_product_5b_product_template" model="product.template">

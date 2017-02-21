@@ -1,11 +1,11 @@
 # coding: utf-8
-from openerp import http
-from openerp.http import request
-from openerp.addons.website_sale.controllers.main import website_sale
-from openerp.addons.website_sale.controllers.main import QueryURL
+from odoo import http
+from odoo.http import request
+from odoo.addons.website_sale.controllers.main import WebsiteSale
+from odoo.addons.website_sale.controllers.main import QueryURL
 
 
-class WebsiteSale(website_sale):
+class WebsiteSale(WebsiteSale):
 
     @http.route([
         '/shop',
@@ -15,9 +15,6 @@ class WebsiteSale(website_sale):
         '/shop/brands'], type='http', auth="public", website=True)
     def shop(self, page=0, category=None, search='', brand='', ppg=False,
              **post):
-        cr, uid, pool = (request.cr,
-                         request.uid,
-                         request.registry)
         res = super(WebsiteSale, self).shop(page=page,
                                             category=category,
                                             search=search, brand=brand,
@@ -29,7 +26,7 @@ class WebsiteSale(website_sale):
             and not category
         if empty:
             return request.redirect('/browse/')
-        category_obj = pool['product.public.category']
+        category_obj = request.env['product.public.category']
         brand_list = request.httprequest.args.getlist('brand')
         brand_selected_ids = [int(b) for b in brand_list if b]
         attrib_list = request.httprequest.args.getlist('attrib')
@@ -39,8 +36,8 @@ class WebsiteSale(website_sale):
         # Update the URL with processed data
         products = res.qcontext['products']
         attributes_ids = category_obj.\
-            _get_attributes_related(cr, uid, products)[0]
-        attributes = pool['product.attribute'].browse(cr, uid, attributes_ids)
+            _get_attributes_related(products)[0]
+        attributes = request.env['product.attribute'].browse(attributes_ids)
         args = res.qcontext['keep'].args
         attribute_ids = attributes.ids
         attribs = [i.split('-')[0] for i in args.get('attrib', [])]
@@ -83,19 +80,16 @@ class WebsiteSale(website_sale):
                     ('product_variant_ids.default_code', 'ilike', srch)]
         if category:
             domain += [('public_categ_ids', 'child_of', int(category))]
-        cr, uid, pool, context = (request.cr, request.uid, request.registry,
-                                  request.context)
         if brand and not search and not category:
             brand_arg = request.httprequest.args.getlist('brand')
             brand_list = [int(v) for v in brand_arg if v]
             domain += [('product_brand_id', 'in', brand_list)]
 
-        product_obj = pool['product.template']
-        prods_ids = product_obj.search(cr, uid, domain, context=context)
-        all_prods = product_obj.browse(cr, uid, prods_ids, context=context)
+        product_obj = request.env['product.template']
+        all_prods = product_obj.search(domain)
         original_products = res.qcontext['products']
-        category_obj = pool['product.public.category']
-        ranges_obj = pool['product.price.ranges']
+        category_obj = request.env['product.public.category']
+        ranges_obj = request.env['product.price.ranges']
         ranges_list = request.httprequest.args.getlist('range')
         brand_list = request.httprequest.args.getlist('brand')
         unknown_list = request.httprequest.args.getlist('unknown')
@@ -106,14 +100,14 @@ class WebsiteSale(website_sale):
         unknown_values = [map(int, a.split("-")) for a in unknown_list if a]
         unknown_set = set([x[0] for x in unknown_values])
         all_attr, all_unknown = category_obj._get_attributes_related(
-            cr, uid, all_prods)
+            all_prods)
         all_categories = res.qcontext.get(
             'products', False) and res.qcontext['products'].mapped(
             'public_categ_ids') or []
-        all_attributes = pool['product.attribute'].browse(
-            cr, uid, all_attr)
-        all_ranges = ranges_obj._get_related_ranges(cr, uid, all_prods)
-        all_brands = category_obj._get_brands_related(cr, uid, all_prods)
+        all_attributes = request.env['product.attribute'].browse(
+            all_attr)
+        all_ranges = ranges_obj._get_related_ranges(all_prods)
+        all_brands = category_obj._get_brands_related(all_prods)
         ordered_products, sortby = self.website_sort_products(
             original_products, default_cookie, post)
         column_data = {
@@ -176,14 +170,10 @@ class WebsiteSale(website_sale):
     @http.route(['/shop/product/<model("product.template"):product>'],
                 type='http', auth="public", website=True)
     def product(self, product, category='', search='', **kwargs):
-        cr, uid, context, pool =\
-            request.cr, request.uid, request.context, request.registry
-        template_obj = pool['product.template']
         if not category and len(product.public_categ_ids) >= 1:
             category = product.public_categ_ids[0]
         viewed = product.views + 1
-        template_obj.write(cr, uid, [product.id],
-                           {'views': viewed}, context=context)
+        product.write({'views': viewed})
         res = super(WebsiteSale, self).product(product=product,
                                                category=category,
                                                search=search, **kwargs)
@@ -204,19 +194,17 @@ class WebsiteSale(website_sale):
         :return: Template with the data to render categories.
         :rtype: render
         """
-        cr, uid, pool = (request.cr,
-                         request.uid,
-                         request.registry)
         keep = QueryURL('/browse', category=category)
-        category_obj = pool['product.public.category']
+        category_obj = request.env['product.public.category'].browse(
+            int(category or 0))
         populars = category_obj._get_product_sorted(
-            cr, uid, int(category or 0), 'rating DESC', 3)
+            'rating DESC', 3)
         newest = category_obj._get_product_sorted(
-            cr, uid, int(category or 0), 'create_date DESC', 3)
+            'create_date DESC', 3)
         categories = not category and \
             category_obj._get_all_categories(
-                cr, uid, [('parent_id', '=', False),
-                          ('has_products_ok', '=', True)]) or category
+                [('parent_id', '=', False),
+                 ('has_products_ok', '=', True)]) or category
         values = {
             'category': category,
             'categories': categories,
@@ -224,11 +212,11 @@ class WebsiteSale(website_sale):
             'newest': newest,
             'keep': keep,
         }
-        return request.website.render(
+        return request.render(
             "website_product_filters.browse_by_category", values)
 
     def _get_search_domain(self, search, category, attrib_values):
-        """This method is a replacement of the original website_sale class,
+        """This method is a replacement of the original WebsiteSale class,
         replaced because the original domain is non inclusive and uses `and`
         conditions but `or` conditions are required to make the the search
         incremental instead of decremental.
