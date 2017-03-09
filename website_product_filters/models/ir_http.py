@@ -22,7 +22,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from odoo import models
+from odoo import models, api, SUPERUSER_ID, registry
 from odoo.http import request
 
 
@@ -40,16 +40,24 @@ class IrHttp(models.AbstractModel):
         # get the cookie from the website
         cookie_sort = request.httprequest.cookies.get('default_sort', '')
         # retrieve the website object
-        current_website = request.env['website'].get_current_website()
-        # get the sort from the request made by te user or the cookie if
-        # not found
-        website_sort = request.params.get('product_sorter', cookie_sort)
-        # get a boolean if we should sort by the default sort configured
-        # in the website settings.
-        backend_sort = bool(
-            not cookie_sort and not website_sort and request.website_enabled)
-        resp.set_cookie(
-            'default_sort',
-            backend_sort and bytes(current_website.default_sort) or
-            website_sort)
+        with api.Environment.manage():
+            with registry(request.env.cr.dbname).cursor() as cr:
+                # oscar@vauxoo.com, Please verify the access Rights related
+                # with this method, we can use portal user instead
+                env = api.Environment(cr, SUPERUSER_ID, {})
+
+                current_website = env['website'].get_current_website()
+            # get the sort from the request made by te user or the cookie # if
+            # not found
+                website_sort = request.params.get(
+                    'product_sorter', cookie_sort)
+    # get a boolean if we should sort by the default sort configured
+    # in the website settings.
+                backend_sort = bool(
+                    not cookie_sort and not website_sort and
+                    request.website_enabled)
+                resp.set_cookie(
+                    'default_sort',
+                    backend_sort and bytes(current_website.default_sort) or
+                    website_sort)
         return resp
